@@ -2,7 +2,6 @@ import os
 import asyncio
 from dotenv import load_dotenv
 
-# Suponiendo que twscrape es una biblioteca hipotética, reemplázala por la que uses.
 from twscrape import API, gather
 
 async def fetch_tweets(api, query, limit=100):
@@ -13,23 +12,29 @@ async def fetch_tweets(api, query, limit=100):
 async def main():
     load_dotenv()  # Carga las variables de entorno desde un archivo .env
 
-    # Estas líneas obtienen las credenciales de Twitter desde las variables de entorno
-    username = os.getenv('TWITTER_USERNAME')
-    password = os.getenv('TWITTER_PASSWORD')
-    email = os.getenv('TWITTER_EMAIL')
-    email_password = os.getenv('TWITTER_EMAIL_PASSWORD')
+    # Estas líneas obtienen las credenciales de X desde las variables de entorno
+    username = os.getenv('X_USERNAME')
+    password = os.getenv('X_PASSWORD')
+    email = os.getenv('X_EMAIL')
+    email_password = os.getenv('X_EMAIL_PASSWORD')
 
     # Inicializa y configura la API de twscrape con las credenciales de usuario
     api = API()
     await api.pool.add_account(username, password, email, email_password)
     await api.pool.login_all()
 
-    # Llama a la función fetch_tweets para extraer tweets con un término específico
-    tweets = await fetch_tweets(api, 'política', limit=100)
+    # Términos de búsqueda para políticos latinoamericanos
+    politicians = ['Gustavo Petro', 'Nayib Bukele', 'Javier Milei']
 
-    # Ejemplo de cómo podrías manejar los tweets extraídos
-    for tweet in tweets:
-        print(f"{tweet.id}\t{tweet.rawContent}\n")
+    # Búsqueda de tweets para cada político
+    for politician in politicians:
+        tweets = await fetch_tweets(api, politician, limit=100)
+
+        # Imprime los tweets para el político actual
+        print(f"Tweets para {politician}:\n")
+        for tweet in tweets:
+            print(f"{tweet.id}\t{tweet.rawContent}\n")
+        print("\n" + "="*100 + "\n")  # Separador entre políticos
 
 if __name__ == "__main__":
     asyncio.run(main())
